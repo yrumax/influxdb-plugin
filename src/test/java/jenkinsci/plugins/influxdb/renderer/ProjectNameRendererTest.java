@@ -14,7 +14,7 @@ public class ProjectNameRendererTest {
     public static final String CUSTOM_PREFIX = "test_prefix";
     public static final String CUSTOM_PROJECT_NAME = "test_projectname";
 
-    private Run<?,?> build;
+    private Run build;
     private Job job;
 
 

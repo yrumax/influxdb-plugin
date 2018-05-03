@@ -18,7 +18,7 @@ public class CustomDataPointGeneratorTest {
     public static final int BUILD_NUMBER = 11;
     public static final String CUSTOM_PREFIX = "test_prefix";
 
-    private Run<?,?> build;
+    private Run build;
     private Job job;
 
     private MeasurementRenderer<Run<?, ?>> measurementRenderer;

@@ -29,7 +29,7 @@ public class PerfPublisherPointGeneratorTest {
     public static final int BUILD_NUMBER = 11;
     public static final String CUSTOM_PREFIX = "test_prefix";
 
-    private Run<?,?> build;
+    private Run build;
     private MeasurementRenderer<Run<?, ?>> measurementRenderer;
     private ReportContainer reports;
 
