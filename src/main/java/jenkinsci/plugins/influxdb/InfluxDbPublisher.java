@@ -1,23 +1,15 @@
 package jenkinsci.plugins.influxdb;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Notifier;
-import hudson.tasks.Publisher;
-import jenkins.tasks.SimpleBuildStep;
-import jenkinsci.plugins.influxdb.generators.*;
-import jenkinsci.plugins.influxdb.models.Target;
-import jenkinsci.plugins.influxdb.renderer.MeasurementRenderer;
-import jenkinsci.plugins.influxdb.renderer.ProjectNameRenderer;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDB.ConsistencyLevel;
 import org.influxdb.InfluxDBFactory;
@@ -26,14 +18,33 @@ import org.influxdb.dto.Point;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
+import hudson.tasks.Publisher;
+import jenkins.tasks.SimpleBuildStep;
+import jenkinsci.plugins.influxdb.generators.ChangeLogPointGenerator;
+import jenkinsci.plugins.influxdb.generators.CoberturaPointGenerator;
+import jenkinsci.plugins.influxdb.generators.CustomDataMapPointGenerator;
+import jenkinsci.plugins.influxdb.generators.CustomDataPointGenerator;
+import jenkinsci.plugins.influxdb.generators.JacocoPointGenerator;
+import jenkinsci.plugins.influxdb.generators.JenkinsBasePointGenerator;
+import jenkinsci.plugins.influxdb.generators.PerfPublisherPointGenerator;
+import jenkinsci.plugins.influxdb.generators.PerformancePointGenerator;
+import jenkinsci.plugins.influxdb.generators.PointGenerator;
+import jenkinsci.plugins.influxdb.generators.RobotFrameworkPointGenerator;
+import jenkinsci.plugins.influxdb.generators.SonarQubePointGenerator;
+import jenkinsci.plugins.influxdb.models.Target;
+import jenkinsci.plugins.influxdb.renderer.MeasurementRenderer;
+import jenkinsci.plugins.influxdb.renderer.ProjectNameRenderer;
 
 public class InfluxDbPublisher extends Notifier implements SimpleBuildStep{
 
@@ -301,6 +312,9 @@ public class InfluxDbPublisher extends Notifier implements SimpleBuildStep{
             pointsToWrite.addAll(Arrays.asList(generator.generate()));
         } catch (Exception e) {
             listener.getLogger().println("[InfluxDB Plugin] Failed to collect data. Ignoring Exception:" + e);
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            listener.getLogger().println(errors);
         }
     }
 
