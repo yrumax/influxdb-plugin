@@ -113,9 +113,20 @@ public class JenkinsBasePointGenerator extends AbstractPointGenerator {
     	List<Point> failedTestPoints = new ArrayList<>();
     	for (TestResult testResult : failedTests) {
             Point.Builder point = buildPoint(measurementName("junit_failed_tests"), customPrefix, build);
-            point.tag(TEST_NAME, testResult.getFullName())
-            .addField(ERROR_MESSAGE, testResult.getErrorDetails())
-            .addField(STACKTRACE, testResult.getErrorStackTrace());
+            String errorMessage = testResult.getErrorDetails();
+            String stackTrace = testResult.getErrorStackTrace();
+            
+            point.tag(TEST_NAME, testResult.getFullName());
+            if (errorMessage != null) {
+            	point.addField(ERROR_MESSAGE, errorMessage);
+            } else {
+            	point.addField(ERROR_MESSAGE, "");
+            }
+            if (stackTrace != null) {
+            	point.addField(STACKTRACE, stackTrace);
+            } else {
+            	point.addField(STACKTRACE, "");
+            }
             failedTestPoints.add(point.build());
     	}
 
